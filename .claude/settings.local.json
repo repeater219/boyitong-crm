@@ -30,7 +30,12 @@
       "Bash(git --version)",
       "Bash(gh --version)",
       "Bash(git config:*)",
-      "Bash(gh auth:*)"
+      "Bash(gh auth:*)",
+      "Bash(git remote:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(git:*)",
+      "Bash(pkill -f \"git push\")"
     ]
   }
 }

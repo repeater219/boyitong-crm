@@ -1,1 +1,6 @@
 .env
+screenshot/
+.DS_Store
+*/target/
+*.db
+*.mv.db
