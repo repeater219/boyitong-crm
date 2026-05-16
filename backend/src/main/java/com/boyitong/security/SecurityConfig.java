@@ -45,6 +45,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/crm/**").authenticated()
                 .requestMatchers("/api/ai/**").authenticated()
                 .requestMatchers("/api/profile/**").authenticated()
+                .requestMatchers("/", "/index.html", "/static/**", "/*.js", "/*.css", "/*.json", "/*.ico", "/*.png", "/*.svg", "/*.jpg", "/*.jpeg", "/*.woff", "/*.woff2", "/*.ttf", "/*.eot", "/assets/**").permitAll()
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers.frameOptions(frame -> frame.disable()))
