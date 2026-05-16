@@ -46,7 +46,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/ai/**").authenticated()
                 .requestMatchers("/api/profile/**").authenticated()
                 .requestMatchers("/", "/index.html", "/static/**", "/*.js", "/*.css", "/*.json", "/*.ico", "/*.png", "/*.svg", "/*.jpg", "/*.jpeg", "/*.woff", "/*.woff2", "/*.ttf", "/*.eot", "/assets/**").permitAll()
-                .anyRequest().authenticated()
+                .requestMatchers("/api/**").authenticated()
+                .anyRequest().permitAll()
             )
             .headers(headers -> headers.frameOptions(frame -> frame.disable()))
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
