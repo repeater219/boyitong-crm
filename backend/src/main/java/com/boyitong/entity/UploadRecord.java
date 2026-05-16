@@ -24,8 +24,7 @@ public class UploadRecord {
     private String fileName;
 
     /** Excel 文件内容 (BLOB) */
-    @Lob
-    @Column(name = "file_data", columnDefinition = "BLOB")
+    @Column(name = "file_data", columnDefinition = "BYTEA")
     private byte[] fileData;
 
     /** 导入的记录数 */
