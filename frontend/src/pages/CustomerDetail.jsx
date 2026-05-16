@@ -73,7 +73,7 @@ export default function CustomerDetail() {
     { label: '面积', value: customer.size ? `${customer.size} m²` : '-' },
     { label: '电话', value: customer.phone },
     { label: '到期日期', value: customer.expiryDate || '-' },
-    { label: '分配对象', value: customer.assignedTo || '未分配' },
+    { label: '原始销售员', value: customer.salesperson || '-' },
     { label: '分配对象', value: customer.assignedTo || '未分配' },
     { label: '备注', value: customer.remarks || '-' },
   ]
