@@ -39,10 +39,21 @@ public class CustomerController {
 
     @GetMapping
     public Result<PageResult<CustomerVO>> list(CustomerQueryDTO query) {
+        String assignedTo = null;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+            boolean isAdmin = auth.getAuthorities().stream()
+                    .anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
+            if (!isAdmin) {
+                assignedTo = auth.getName();
+            }
+        }
+
         Page<Customer> page = customerServiceImpl.searchCustomers(
                 query.getCity(), query.getArea(), query.getCategory(),
                 query.getMinSize(), query.getMaxSize(),
                 query.getSalesperson(), query.getKeyword(),
+                assignedTo,
                 query.getPage(), query.getSize(),
                 query.getSortBy(), query.getSortDir());
 
@@ -59,12 +70,14 @@ public class CustomerController {
     @GetMapping("/{id}")
     public Result<CustomerVO> getById(@PathVariable Long id) {
         Customer customer = customerService.findById(id);
+        checkCustomerAccess(customer);
         return Result.success(CustomerVO.fromEntity(customer));
     }
 
     @PutMapping("/{id}")
     public Result<CustomerVO> update(@PathVariable Long id, @RequestBody CustomerVO vo) {
         Customer existing = customerService.findById(id);
+        checkCustomerAccess(existing);
         if (vo.getCity() != null) existing.setCity(vo.getCity());
         if (vo.getArea() != null) existing.setArea(vo.getArea());
         if (vo.getAddress() != null) existing.setAddress(vo.getAddress());
@@ -88,7 +101,8 @@ public class CustomerController {
 
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
-        customerService.findById(id); // ensure exists
+        Customer customer = customerService.findById(id); // ensure exists
+        checkCustomerAccess(customer);
         customerServiceImpl.getCustomerRepository().deleteById(id);
 
         String username = getCurrentUsername();
@@ -106,6 +120,21 @@ public class CustomerController {
             return auth.getName();
         }
         return null;
+    }
+
+    /** 校验当前用户是否有权访问该客户 */
+    private void checkCustomerAccess(Customer customer) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+            boolean isAdmin = auth.getAuthorities().stream()
+                    .anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
+            if (!isAdmin) {
+                String username = auth.getName();
+                if (customer.getAssignedTo() == null || !customer.getAssignedTo().equals(username)) {
+                    throw new RuntimeException("无权访问该客户数据");
+                }
+            }
+        }
     }
 
     @PostMapping("/import")
@@ -157,7 +186,19 @@ public class CustomerController {
     /** 客户下拉选项（轻量级，仅返回 id + 地址） */
     @GetMapping("/options")
     public Result<List<Map<String, Object>>> getOptions() {
-        List<Customer> all = customerRepository.findAll();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        List<Customer> all;
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+            boolean isAdmin = auth.getAuthorities().stream()
+                    .anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
+            if (isAdmin) {
+                all = customerRepository.findAll();
+            } else {
+                all = customerRepository.findByAssignedTo(auth.getName());
+            }
+        } else {
+            all = customerRepository.findAll();
+        }
         List<Map<String, Object>> options = all.stream().map(c -> {
             Map<String, Object> m = new java.util.HashMap<>();
             m.put("id", c.getId());

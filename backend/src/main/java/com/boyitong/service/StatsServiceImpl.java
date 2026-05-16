@@ -19,7 +19,15 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public StatsVO getStats() {
-        List<Customer> all = customerRepository.findAll();
+        return buildStats(customerRepository.findAll());
+    }
+
+    @Override
+    public StatsVO getStatsForUser(String username) {
+        return buildStats(customerRepository.findByAssignedTo(username));
+    }
+
+    private StatsVO buildStats(List<Customer> all) {
 
         StatsVO stats = new StatsVO();
         stats.setTotalCustomers(all.size());

@@ -12,7 +12,8 @@ public class CustomerSpecification {
     public static Specification<Customer> withFilters(
             String city, String area, String category,
             Double minSize, Double maxSize,
-            String salesperson, String keyword) {
+            String salesperson, String keyword,
+            String assignedTo) {
 
         return (Root<Customer> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
             Predicate predicate = cb.conjunction();
@@ -41,6 +42,9 @@ public class CustomerSpecification {
                 Predicate remarksLike = cb.like(root.get("remarks"), pattern);
                 Predicate phoneLike = cb.like(root.get("phone"), pattern);
                 predicate = cb.and(predicate, cb.or(addressLike, remarksLike, phoneLike));
+            }
+            if (StringUtils.hasText(assignedTo)) {
+                predicate = cb.and(predicate, cb.equal(root.get("assignedTo"), assignedTo));
             }
 
             return predicate;

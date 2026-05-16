@@ -10,6 +10,7 @@ export default function Customers() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const isAdmin = user?.role === 'ADMIN'
+  const displayNameMap = { 'admin': '管理员', 'zhangrui': '张睿', 'wangxian': '王鲜' }
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -108,7 +109,7 @@ export default function Customers() {
                   <th className="text-left px-4 py-3 font-medium text-gray-600">区域</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">行业</th>
                   <th className="text-right px-4 py-3 font-medium text-gray-600">面积</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">销售员</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">分配对象</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">日期</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-600">操作</th>
                 </tr>
@@ -137,7 +138,7 @@ export default function Customers() {
                         <td className="px-4 py-3">{c.area}</td>
                         <td className="px-4 py-3 max-w-[150px] truncate">{c.category}</td>
                         <td className="px-4 py-3 text-right">{c.size ? c.size : '-'}</td>
-                        <td className="px-4 py-3">{c.salesperson}</td>
+                        <td className="px-4 py-3">{displayNameMap[c.assignedTo] || c.assignedTo || c.salesperson}</td>
                         <td className="px-4 py-3 text-gray-500">{c.date}</td>
                         <td className="px-4 py-3">
                           <button onClick={() => navigate(`/customers/${c.id}`)} className="text-blue-600 hover:text-blue-800 text-sm mr-2">详情</button>

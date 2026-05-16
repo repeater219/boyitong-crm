@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,7 +39,17 @@ public class ExportController {
             HttpServletResponse response) throws Exception {
 
         Specification<Customer> spec = com.boyitong.entity.CustomerSpecification.withFilters(
-                city, area, category, minSize, maxSize, salesperson, keyword);
+                city, area, category, minSize, maxSize, salesperson, keyword, null);
+
+        // USER 角色只能导出分配给自己的客户
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+            boolean isAdmin = auth.getAuthorities().stream()
+                    .anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
+            if (!isAdmin) {
+                spec = spec.and((root, query, cb) -> cb.equal(root.get("assignedTo"), auth.getName()));
+            }
+        }
 
         List<Customer> customers = customerRepository.findAll(spec);
 

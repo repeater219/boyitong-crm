@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react'
 import { Table, Button, Modal, Form, Input, InputNumber, Popconfirm, message, Tag, Card, Row, Col, Statistic } from 'antd'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
+import { useAuth } from '../services/AuthContext.jsx'
 import api from '../services/api.js'
 
 export default function Products() {
+  const { user } = useAuth()
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
   const [open, setOpen] = useState(false)
   const [form] = Form.useForm()
+  const isAdmin = user?.role === 'ADMIN'
 
   const load = () => { setLoading(true); api.get('/crm/products').then(r => setData(r.data.data || [])).finally(() => setLoading(false)) }
   useEffect(() => { load() }, [])
@@ -30,7 +33,7 @@ export default function Products() {
     { title: '单位', dataIndex: 'unit', key: 'unit' },
     { title: '单价', dataIndex: 'price', key: 'price', render: v => `¥${v?.toFixed(2)}` },
     { title: '描述', dataIndex: 'description', key: 'description', ellipsis: true },
-    { title: '操作', key: 'action', render: (_, r) => <Popconfirm title="确定删除?" onConfirm={() => onDelete(r.id)}><Button type="link" danger icon={<DeleteOutlined />}>删除</Button></Popconfirm> },
+    ...(isAdmin ? [{ title: '操作', key: 'action', render: (_, r) => <Popconfirm title="确定删除?" onConfirm={() => onDelete(r.id)}><Button type="link" danger icon={<DeleteOutlined />}>删除</Button></Popconfirm> }] : []),
   ]
 
   return (
@@ -38,7 +41,7 @@ export default function Products() {
       <Row gutter={16} style={{ marginBottom: 16 }}>
         <Col span={6}><Card><Statistic title="产品总数" value={data.length} /></Card></Col>
       </Row>
-      <div style={{ marginBottom: 16 }}><Button type="primary" icon={<PlusOutlined />} onClick={() => setOpen(true)}>添加产品</Button></div>
+      <div style={{ marginBottom: 16 }}>{isAdmin && <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpen(true)}>添加产品</Button>}</div>
       <Table rowKey="id" columns={columns} dataSource={data} loading={loading} />
       <Modal title="添加产品" open={open} onOk={onCreate} onCancel={() => { setOpen(false); form.resetFields() }}>
         <Form form={form} layout="vertical">

@@ -34,8 +34,16 @@ public class CrmController {
 
     // ========= PRODUCTS =========
     @GetMapping("/products") public Result<List<Product>> getProducts() { return Result.success(productRepo.findAll()); }
-    @PostMapping("/products") public Result<Product> createProduct(@RequestBody Product p) { return Result.success(productRepo.save(p)); }
-    @DeleteMapping("/products/{id}") public Result<Void> deleteProduct(@PathVariable Long id) { productRepo.deleteById(id); return Result.success(); }
+    @PostMapping("/products") public Result<Product> createProduct(@RequestBody Product p, Authentication auth) {
+        boolean isAdmin = auth.getAuthorities().stream().anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
+        if (!isAdmin) throw new RuntimeException("仅管理员可添加产品");
+        return Result.success(productRepo.save(p));
+    }
+    @DeleteMapping("/products/{id}") public Result<Void> deleteProduct(@PathVariable Long id, Authentication auth) {
+        boolean isAdmin = auth.getAuthorities().stream().anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
+        if (!isAdmin) throw new RuntimeException("仅管理员可删除产品");
+        productRepo.deleteById(id); return Result.success();
+    }
 
     // ========= OPPORTUNITIES =========
     @GetMapping("/opportunities") public Result<List<Opportunity>> getOpps(Authentication auth) { return Result.success(oppRepo.findBySalespersonOrderByCreatedAtDesc(auth.getName())); }
@@ -49,9 +57,17 @@ public class CrmController {
     private double calcWinRate(String stage) { return switch(stage) { case "INTENT" -> 10; case "PROPOSAL" -> 30; case "QUOTATION" -> 50; case "NEGOTIATION" -> 70; case "WON" -> 100; default -> 0; }; }
 
     // ========= CONTRACTS =========
-    @GetMapping("/contracts") public Result<List<Contract>> getContracts() { return Result.success(contractRepo.findAll()); }
-    @PostMapping("/contracts") public Result<Contract> createContract(@RequestBody Contract c) {
-        c.setContractNo("CT-" + System.currentTimeMillis() % 1000000); return Result.success(contractRepo.save(c));
+    @GetMapping("/contracts") public Result<List<Contract>> getContracts(Authentication auth) {
+        boolean isAdmin = auth.getAuthorities().stream().anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
+        if (isAdmin) {
+            return Result.success(contractRepo.findAll());
+        }
+        return Result.success(contractRepo.findBySalespersonOrderByCreatedAtDesc(auth.getName()));
+    }
+    @PostMapping("/contracts") public Result<Contract> createContract(@RequestBody Contract c, Authentication auth) {
+        c.setContractNo("CT-" + System.currentTimeMillis() % 1000000);
+        c.setSalesperson(auth.getName());
+        return Result.success(contractRepo.save(c));
     }
     @PutMapping("/contracts/{id}/status") public Result<Contract> updateContractStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
         Contract c = contractRepo.findById(id).orElseThrow(); c.setStatus(body.get("status")); return Result.success(contractRepo.save(c));
@@ -67,6 +83,14 @@ public class CrmController {
 
     // ========= ANNOUNCEMENTS =========
     @GetMapping("/announcements") public Result<List<Announcement>> getAnnouncements() { return Result.success(announcementRepo.findAllByOrderByPinnedDescCreatedAtDesc()); }
-    @PostMapping("/announcements") public Result<Announcement> createAnnouncement(@RequestBody Announcement a, Authentication auth) { a.setAuthor(auth.getName()); return Result.success(announcementRepo.save(a)); }
-    @DeleteMapping("/announcements/{id}") public Result<Void> deleteAnnouncement(@PathVariable Long id) { announcementRepo.deleteById(id); return Result.success(); }
+    @PostMapping("/announcements") public Result<Announcement> createAnnouncement(@RequestBody Announcement a, Authentication auth) {
+        boolean isAdmin = auth.getAuthorities().stream().anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
+        if (!isAdmin) throw new RuntimeException("仅管理员可发布公告");
+        a.setAuthor(auth.getName()); return Result.success(announcementRepo.save(a));
+    }
+    @DeleteMapping("/announcements/{id}") public Result<Void> deleteAnnouncement(@PathVariable Long id, Authentication auth) {
+        boolean isAdmin = auth.getAuthorities().stream().anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
+        if (!isAdmin) throw new RuntimeException("仅管理员可删除公告");
+        announcementRepo.deleteById(id); return Result.success();
+    }
 }

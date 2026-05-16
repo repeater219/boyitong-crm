@@ -18,6 +18,14 @@ import Announcements from './pages/Announcements.jsx'
 import CalendarView from './pages/CalendarView.jsx'
 import Profile from './pages/Profile.jsx'
 
+function AdminRoute({ children }) {
+  const { user } = useAuth()
+  if (user?.role !== 'ADMIN') {
+    return <Navigate to="/dashboard" replace />
+  }
+  return children
+}
+
 function App() {
   const { user, loading } = useAuth()
 
@@ -36,9 +44,9 @@ function App() {
             <Route path="/customers" element={<Customers />} />
             <Route path="/customers/:id" element={<CustomerDetail />} />
             <Route path="/import" element={<Import />} />
-            <Route path="/review" element={<ReviewPage />} />
+            <Route path="/review" element={<AdminRoute><ReviewPage /></AdminRoute>} />
             <Route path="/my-uploads" element={<MyUploads />} />
-            <Route path="/audit-logs" element={<AuditLogs />} />
+            <Route path="/audit-logs" element={<AdminRoute><AuditLogs /></AdminRoute>} />
             <Route path="/tasks" element={<Tasks />} />
             <Route path="/products" element={<Products />} />
             <Route path="/opportunities" element={<Opportunities />} />

@@ -49,10 +49,11 @@ public class CustomerServiceImpl implements CustomerService {
             String city, String area, String category,
             Double minSize, Double maxSize,
             String salesperson, String keyword,
+            String assignedTo,
             int page, int size, String sortBy, String sortDir) {
 
         Specification<Customer> spec = CustomerSpecification.withFilters(
-                city, area, category, minSize, maxSize, salesperson, keyword);
+                city, area, category, minSize, maxSize, salesperson, keyword, assignedTo);
 
         Sort sort = sortDir.equalsIgnoreCase("desc")
                 ? Sort.by(sortBy).descending()

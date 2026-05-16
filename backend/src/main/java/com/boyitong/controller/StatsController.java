@@ -5,6 +5,8 @@ import com.boyitong.dto.StatsVO;
 import com.boyitong.entity.Customer;
 import com.boyitong.repository.CustomerRepository;
 import com.boyitong.service.StatsService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,12 +28,32 @@ public class StatsController {
 
     @GetMapping
     public Result<StatsVO> getStats() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+            boolean isAdmin = auth.getAuthorities().stream()
+                    .anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
+            if (!isAdmin) {
+                return Result.success(statsService.getStatsForUser(auth.getName()));
+            }
+        }
         return Result.success(statsService.getStats());
     }
 
     @GetMapping("/trends")
     public Result<Map<String, Object>> getTrends() {
-        List<Customer> all = customerRepository.findAll();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        List<Customer> all;
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+            boolean isAdmin = auth.getAuthorities().stream()
+                    .anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
+            if (!isAdmin) {
+                all = customerRepository.findByAssignedTo(auth.getName());
+            } else {
+                all = customerRepository.findAll();
+            }
+        } else {
+            all = customerRepository.findAll();
+        }
 
         Map<String, Long> statusCount = all.stream()
                 .filter(c -> c.getStatus() != null)

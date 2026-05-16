@@ -36,7 +36,7 @@ public class AiService {
 
     @PostConstruct
     public void init() {
-        System.out.println("=== AI Init: key=" + (apiKey != null ? apiKey.substring(0, 10) + "..." : "NULL") + " url=" + apiUrl);
+        System.out.println("=== AI Init: key=" + (apiKey != null && apiKey.length() >= 10 ? apiKey.substring(0, 10) + "..." : (apiKey != null ? apiKey : "NULL")) + " url=" + apiUrl);
     }
 
     public String chat(String userMessage) {

@@ -70,7 +70,7 @@ class CustomerServiceTest {
                 .thenReturn(page);
 
         Page<Customer> result = customerService.searchCustomers(
-                "柳州", null, null, null, null, null, null,
+                "柳州", null, null, null, null, null, null, null,
                 0, 20, "id", "asc");
 
         assertEquals(1, result.getContent().size());

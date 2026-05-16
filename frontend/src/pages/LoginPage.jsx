@@ -162,7 +162,7 @@ export default function LoginPage() {
                 style={{ borderRadius: 10, height: 48, fontSize: 16 }}>登 录</Button>
             </Form.Item>
           </Form>
-          <Space direction="vertical" size={4} style={{ width: '100%', textAlign: 'center' }}>
+          <Space orientation="vertical" size={4} style={{ width: '100%', textAlign: 'center' }}>
             <Text type="secondary" style={{ fontSize: 12 }}>测试账号：admin / admin123（管理员）</Text>
             <Text type="secondary" style={{ fontSize: 12 }}>zhangrui / 123456（业务员）</Text>
           </Space>
