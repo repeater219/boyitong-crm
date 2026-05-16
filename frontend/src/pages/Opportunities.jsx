@@ -23,10 +23,10 @@ export default function Opportunities() {
     setLoading(true)
     const [opps, custs] = await Promise.all([
       api.get('/crm/opportunities'),
-      api.get('/customers', { params: { size: 999 } })
+      api.get('/customers/options')
     ])
     setData(opps.data.data || [])
-    setCustomers(custs.data.data?.content || [])
+    setCustomers(custs.data.data || [])
     setLoading(false)
   }
   useEffect(() => { load() }, [])
@@ -74,7 +74,7 @@ export default function Opportunities() {
           <Form.Item name="name" label="商机名称" rules={[{ required: true }]}><Input /></Form.Item>
           <Form.Item name="customerId" label="关联客户" rules={[{ required: true }]}>
             <Select showSearch optionFilterProp="label"
-              options={customers.map(c => ({ value: c.id, label: `#${c.id} ${c.address?.slice(0, 20)}` }))} />
+              options={customers.map(c => ({ value: c.id, label: c.label }))} />
           </Form.Item>
           <Form.Item name="amount" label="预计金额"><InputNumber style={{ width: '100%' }} prefix="¥" /></Form.Item>
           <Form.Item name="stage" label="阶段" initialValue="INTENT">

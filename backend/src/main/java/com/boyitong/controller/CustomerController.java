@@ -154,6 +154,19 @@ public class CustomerController {
         return Result.success(matches.stream().map(CustomerVO::fromEntity).toList());
     }
 
+    /** 客户下拉选项（轻量级，仅返回 id + 地址） */
+    @GetMapping("/options")
+    public Result<List<Map<String, Object>>> getOptions() {
+        List<Customer> all = customerRepository.findAll();
+        List<Map<String, Object>> options = all.stream().map(c -> {
+            Map<String, Object> m = new java.util.HashMap<>();
+            m.put("id", c.getId());
+            m.put("label", "#" + c.getId() + " " + (c.getAddress() != null ? c.getAddress().substring(0, Math.min(c.getAddress().length(), 30)) : ""));
+            return m;
+        }).toList();
+        return Result.success(options);
+    }
+
     /** 获取未分配的客户 */
     @GetMapping("/unassigned")
     public Result<List<CustomerVO>> getUnassigned() {
