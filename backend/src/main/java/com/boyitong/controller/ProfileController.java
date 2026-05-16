@@ -3,6 +3,7 @@ package com.boyitong.controller;
 import com.boyitong.common.Result;
 import com.boyitong.entity.User;
 import com.boyitong.repository.UserRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -45,20 +46,20 @@ public class ProfileController {
     }
 
     @PutMapping("/password")
-    public Result<Void> changePassword(@RequestBody Map<String, String> body, Authentication auth) {
+    public ResponseEntity<Result<Void>> changePassword(@RequestBody Map<String, String> body, Authentication auth) {
         User user = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("用户不存在"));
         String oldPassword = body.get("oldPassword");
         String newPassword = body.get("newPassword");
         if (oldPassword == null || newPassword == null || newPassword.length() < 6) {
-            return Result.error(400, "密码长度不能少于6位");
+            return ResponseEntity.badRequest().body(Result.error(400, "密码长度不能少于6位"));
         }
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-            return Result.error(400, "原密码错误");
+            return ResponseEntity.badRequest().body(Result.error(400, "原密码错误"));
         }
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
-        return Result.success();
+        return ResponseEntity.ok(Result.success());
     }
 
     @PostMapping("/avatar")
