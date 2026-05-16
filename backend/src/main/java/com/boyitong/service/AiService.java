@@ -5,6 +5,7 @@ import com.boyitong.entity.Customer;
 import com.boyitong.repository.CustomerRepository;
 import com.boyitong.repository.ContractRepository;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -19,9 +20,14 @@ public class AiService {
     private final CustomerRepository customerRepository;
     private final ContractRepository contractRepository;
 
+    @Value("${ai.api-key:}")
     private String apiKey;
-    private String apiUrl = "https://api.openai-proxy.org/v1/chat/completions";
-    private String model = "deepseek-chat";
+
+    @Value("${ai.api-url:https://api.openai-proxy.org/v1/chat/completions}")
+    private String apiUrl;
+
+    @Value("${ai.model:deepseek-chat}")
+    private String model;
 
     public AiService(CustomerRepository customerRepository, ContractRepository contractRepository) {
         this.customerRepository = customerRepository;
@@ -30,18 +36,6 @@ public class AiService {
 
     @PostConstruct
     public void init() {
-        // Read from .env file
-        try {
-            java.nio.file.Path envPath = java.nio.file.Paths.get(
-                "/Users/Zhuanz/Desktop/internship/backend/.env");
-            if (java.nio.file.Files.exists(envPath)) {
-                for (String line : java.nio.file.Files.readAllLines(envPath)) {
-                    if (line.startsWith("DEEPSEEK_API_KEY=")) apiKey = line.substring("DEEPSEEK_API_KEY=".length());
-                    if (line.startsWith("DEEPSEEK_API_URL=")) apiUrl = line.substring("DEEPSEEK_API_URL=".length());
-                    if (line.startsWith("DEEPSEEK_MODEL=")) model = line.substring("DEEPSEEK_MODEL=".length());
-                }
-            }
-        } catch (Exception ignored) {}
         System.out.println("=== AI Init: key=" + (apiKey != null ? apiKey.substring(0, 10) + "..." : "NULL") + " url=" + apiUrl);
     }
 
