@@ -35,7 +35,9 @@
       "Bash(git branch:*)",
       "Bash(git push:*)",
       "Bash(git:*)",
-      "Bash(pkill -f \"git push\")"
+      "Bash(pkill -f \"git push\")",
+      "Bash(npm run:*)",
+      "Bash(mkdir:*)"
     ]
   }
 }
