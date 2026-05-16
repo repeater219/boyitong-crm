@@ -48,6 +48,14 @@ public class DatabaseMigration implements CommandLineRunner {
             log.info("app_users.avatar_url migration skipped: {}", e.getMessage());
         }
 
+        // upload_records.file_data: OID → BYTEA
+        try {
+            jdbc.execute("ALTER TABLE upload_records ALTER COLUMN file_data TYPE BYTEA USING file_data::bytea");
+            log.info("Migrated upload_records.file_data: OID → BYTEA");
+        } catch (Exception e) {
+            log.info("upload_records.file_data migration skipped: {}", e.getMessage());
+        }
+
         log.info("Database migration complete");
     }
 }
