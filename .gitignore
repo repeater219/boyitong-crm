@@ -4,3 +4,4 @@ screenshot/
 */target/
 *.db
 *.mv.db
+logs.*.log
