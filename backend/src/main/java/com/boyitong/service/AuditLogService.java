@@ -19,6 +19,10 @@ public class AuditLogService {
         auditLogRepository.save(new AuditLog(username, action, targetType, targetId, detail));
     }
 
+    public void log(String username, Long userId, String action, String targetType, String targetId, String detail) {
+        auditLogRepository.save(new AuditLog(username, userId, action, targetType, targetId, detail));
+    }
+
     public List<AuditLog> findAll() {
         return auditLogRepository.findAllByOrderByCreatedAtDesc();
     }

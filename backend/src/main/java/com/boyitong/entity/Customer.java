@@ -62,6 +62,10 @@ public class Customer {
     @Column(name = "assigned_to")
     private String assignedTo;
 
+    /** 分配给哪个销售员（用户ID） */
+    @Column(name = "assigned_to_user_id")
+    private Long assignedToUserId;
+
     public Customer() {}
 
     // Getters and Setters
@@ -106,4 +110,7 @@ public class Customer {
 
     public String getAssignedTo() { return assignedTo; }
     public void setAssignedTo(String assignedTo) { this.assignedTo = assignedTo; }
+
+    public Long getAssignedToUserId() { return assignedToUserId; }
+    public void setAssignedToUserId(Long assignedToUserId) { this.assignedToUserId = assignedToUserId; }
 }

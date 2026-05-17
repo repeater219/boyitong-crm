@@ -17,6 +17,10 @@ public class FollowUp {
     @Column(name = "salesperson", nullable = false)
     private String salesperson;
 
+    /** 跟进人用户ID */
+    @Column(name = "salesperson_user_id")
+    private Long salespersonUserId;
+
     /** 跟进方式: PHONE / VISIT / CHAT / OTHER */
     @Column(name = "method")
     private String method;
@@ -39,6 +43,9 @@ public class FollowUp {
 
     public String getSalesperson() { return salesperson; }
     public void setSalesperson(String salesperson) { this.salesperson = salesperson; }
+
+    public Long getSalespersonUserId() { return salespersonUserId; }
+    public void setSalespersonUserId(Long salespersonUserId) { this.salespersonUserId = salespersonUserId; }
 
     public String getMethod() { return method; }
     public void setMethod(String method) { this.method = method; }

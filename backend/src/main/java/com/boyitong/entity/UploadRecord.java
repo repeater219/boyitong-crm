@@ -15,6 +15,10 @@ public class UploadRecord {
     @Column(name = "uploader", nullable = false)
     private String uploader;
 
+    /** 上传者用户ID */
+    @Column(name = "uploader_user_id")
+    private Long uploaderUserId;
+
     /** 城市 */
     @Column(name = "city")
     private String city;
@@ -39,6 +43,10 @@ public class UploadRecord {
     @Column(name = "reviewer")
     private String reviewer;
 
+    /** 审核者用户ID */
+    @Column(name = "reviewer_user_id")
+    private Long reviewerUserId;
+
     /** 审核备注 */
     @Column(name = "review_comment", length = 500)
     private String reviewComment;
@@ -57,6 +65,9 @@ public class UploadRecord {
     public String getUploader() { return uploader; }
     public void setUploader(String uploader) { this.uploader = uploader; }
 
+    public Long getUploaderUserId() { return uploaderUserId; }
+    public void setUploaderUserId(Long uploaderUserId) { this.uploaderUserId = uploaderUserId; }
+
     public String getCity() { return city; }
     public void setCity(String city) { this.city = city; }
 
@@ -74,6 +85,9 @@ public class UploadRecord {
 
     public String getReviewer() { return reviewer; }
     public void setReviewer(String reviewer) { this.reviewer = reviewer; }
+
+    public Long getReviewerUserId() { return reviewerUserId; }
+    public void setReviewerUserId(Long reviewerUserId) { this.reviewerUserId = reviewerUserId; }
 
     public String getReviewComment() { return reviewComment; }
     public void setReviewComment(String reviewComment) { this.reviewComment = reviewComment; }

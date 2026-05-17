@@ -32,9 +32,9 @@ public class AuthController {
             throw new RuntimeException("用户名或密码错误");
         }
 
-        String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
+        String token = jwtUtil.generateToken(user.getUsername(), user.getRole(), user.getId());
         LoginResponse response = new LoginResponse(token, user.getUsername(),
-                user.getDisplayName(), user.getRole(), user.getAvatarUrl());
+                user.getDisplayName(), user.getRole(), user.getAvatarUrl(), user.getId());
         return Result.success(response);
     }
 
@@ -45,6 +45,6 @@ public class AuthController {
         String role = jwtUtil.getRole(token);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return Result.success(new LoginResponse(token, username, user.getDisplayName(), role, user.getAvatarUrl()));
+        return Result.success(new LoginResponse(token, username, user.getDisplayName(), role, user.getAvatarUrl(), user.getId()));
     }
 }

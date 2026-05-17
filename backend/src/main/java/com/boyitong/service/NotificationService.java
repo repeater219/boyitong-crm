@@ -19,6 +19,12 @@ public class NotificationService {
         notificationRepository.save(new Notification(recipient, title, content));
     }
 
+    public void create(String recipient, Long recipientUserId, String title, String content) {
+        Notification n = new Notification(recipient, title, content);
+        n.setRecipientUserId(recipientUserId);
+        notificationRepository.save(n);
+    }
+
     public List<Notification> getForUser(String username) {
         return notificationRepository.findByRecipientOrderByCreatedAtDesc(username);
     }

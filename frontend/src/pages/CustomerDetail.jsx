@@ -19,13 +19,14 @@ const METHOD_LABELS = { 'PHONE': '电话', 'VISIT': '拜访', 'CHAT': '微信/�
 export default function CustomerDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, userMap } = useAuth()
   const isAdmin = user?.role === 'ADMIN'
   const [customer, setCustomer] = useState(null)
   const [followUps, setFollowUps] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [newFollow, setNewFollow] = useState({ method: 'PHONE', content: '', nextFollowDate: '' })
+  const [salespersons, setSalespersons] = useState([])
 
   const load = async () => {
     try {
@@ -33,6 +34,9 @@ export default function CustomerDetail() {
       setCustomer(c)
       const res = await api.get(`/follow-ups/customer/${id}`)
       setFollowUps(res.data.data || [])
+      // Load salespersons for assign dropdown
+      const usersRes = await api.get('/users/salespersons')
+      setSalespersons(usersRes.data.data || [])
     } catch (e) {
       setError(e.message)
     } finally {
@@ -96,8 +100,9 @@ export default function CustomerDetail() {
             <div className="flex gap-2 mb-4">
               <select onChange={e => assignTo(e.target.value)} value={customer.assignedTo || ''} className="border rounded px-2 py-1 text-sm">
                 <option value="">分配客户...</option>
-                <option value="zhangrui">张睿</option>
-                <option value="wangxian">王鲜</option>
+                {salespersons.map(sp => (
+                  <option key={sp.username} value={sp.username}>{sp.displayName}</option>
+                ))}
               </select>
               <select onChange={e => changeStatus(e.target.value)} value={customer.status} className="border rounded px-2 py-1 text-sm">
                 <option value="NEW">设为：新线索</option>

@@ -8,9 +8,8 @@ import { useAuth } from '../services/AuthContext.jsx'
 
 export default function Customers() {
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, userMap } = useAuth()
   const isAdmin = user?.role === 'ADMIN'
-  const displayNameMap = { 'admin': '管理员', 'zhangrui': '张睿', 'wangxian': '王鲜' }
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -138,7 +137,7 @@ export default function Customers() {
                         <td className="px-4 py-3">{c.area}</td>
                         <td className="px-4 py-3 max-w-[150px] truncate">{c.category}</td>
                         <td className="px-4 py-3 text-right">{c.size ? c.size : '-'}</td>
-                        <td className="px-4 py-3">{displayNameMap[c.assignedTo] || c.assignedTo || c.salesperson}</td>
+                        <td className="px-4 py-3">{userMap[c.assignedTo] || c.assignedTo || c.salesperson}</td>
                         <td className="px-4 py-3 text-gray-500">{c.date}</td>
                         <td className="px-4 py-3">
                           <button onClick={() => navigate(`/customers/${c.id}`)} className="text-blue-600 hover:text-blue-800 text-sm mr-2">详情</button>

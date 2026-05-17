@@ -88,7 +88,7 @@ class ProfileControllerTest {
         mockMvc.perform(put("/api/profile/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"oldPassword\":\"wrong\",\"newPassword\":\"newpass123\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400));
     }
 
@@ -97,7 +97,7 @@ class ProfileControllerTest {
         mockMvc.perform(put("/api/profile/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"oldPassword\":\"admin123\",\"newPassword\":\"123\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400));
     }
 
@@ -106,7 +106,7 @@ class ProfileControllerTest {
         mockMvc.perform(put("/api/profile/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400));
     }
 

@@ -14,6 +14,10 @@ public class Task {
     @Column(name = "assignee", nullable = false)
     private String assignee;
 
+    /** 责任人用户ID */
+    @Column(name = "assignee_user_id")
+    private Long assigneeUserId;
+
     @Column(name = "title", nullable = false)
     private String title;
 
@@ -43,6 +47,9 @@ public class Task {
 
     public String getAssignee() { return assignee; }
     public void setAssignee(String assignee) { this.assignee = assignee; }
+
+    public Long getAssigneeUserId() { return assigneeUserId; }
+    public void setAssigneeUserId(Long assigneeUserId) { this.assigneeUserId = assigneeUserId; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }

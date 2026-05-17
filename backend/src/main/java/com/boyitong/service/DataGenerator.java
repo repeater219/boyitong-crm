@@ -23,22 +23,32 @@ public class DataGenerator implements CommandLineRunner {
     private final ContractRepository contractRepo;
     private final PaymentRepository paymentRepo;
     private final AnnouncementRepository announcementRepo;
+    private final UserRepository userRepository;
     private final Random r = new Random(42);
+    private final String[] systemUsers = {"zhangrui", "wangxian"};
+    private final String[] salesPeople = {"张睿", "王鲜", "改飞", "李华", "赵明", "陈静", "刘洋", "周梅", "吴强", "郑丽"};
+    private Map<String, Long> userIdMap = Map.of();
 
     public DataGenerator(CustomerRepository customerRepo, ProductRepository productRepo,
                          OpportunityRepository oppRepo, ContractRepository contractRepo,
-                         PaymentRepository paymentRepo, AnnouncementRepository announcementRepo) {
+                         PaymentRepository paymentRepo, AnnouncementRepository announcementRepo,
+                         UserRepository userRepository) {
         this.customerRepo = customerRepo;
         this.productRepo = productRepo;
         this.oppRepo = oppRepo;
         this.contractRepo = contractRepo;
         this.paymentRepo = paymentRepo;
         this.announcementRepo = announcementRepo;
+        this.userRepository = userRepository;
     }
 
     @Override
     public void run(String... args) {
         long customerCount = customerRepo.count();
+        // Build userId map for setting userId fields
+        Map<String, Long> map = new HashMap<>();
+        userRepository.findAll().forEach(u -> map.put(u.getUsername(), u.getId()));
+        this.userIdMap = map;
         if (customerCount > 1500) {
             log.info("Database already has {} customers, skipping customer generation", customerCount);
         } else {
@@ -118,6 +128,7 @@ public class DataGenerator implements CommandLineRunner {
             o.setStage(stage);
             o.setWinRate(winRates[Arrays.asList(stages).indexOf(stage)]);
             o.setSalesperson(r.nextBoolean() ? "admin" : "zhangrui");
+            o.setSalespersonUserId(userIdMap.get(o.getSalesperson()));
             o.setDescription("跟进" + c.getCity() + "客户关于" + c.getCategory() + "的商机");
             oppRepo.save(o);
         }
@@ -142,6 +153,7 @@ public class DataGenerator implements CommandLineRunner {
             ct.setStartDate(LocalDate.of(2026, 1 + r.nextInt(5), 1 + r.nextInt(28)));
             ct.setEndDate(ct.getStartDate().plusMonths(1 + r.nextInt(12)));
             ct.setSalesperson("admin");
+            ct.setSalespersonUserId(userIdMap.get("admin"));
             ct.setDescription(c.getAddress());
             contractRepo.save(ct);
 
@@ -189,7 +201,6 @@ public class DataGenerator implements CommandLineRunner {
         String[] categories = {"商铺转让", "餐饮转让", "店面转让", "店铺转让", "超市转让",
                 "美容转让", "酒吧转让", "火锅店转让", "烧烤店转让", "奶茶店转让",
                 "服装店转让", "棋牌室转让", "快递驿站转让", "宾馆转让", "培训机构转让"};
-        String[] salesPeople = {"张睿", "王鲜", "改飞", "李华", "赵明", "陈静", "刘洋", "周梅", "吴强", "郑丽"};
 
         for (int i = 0; i < count; i++) {
             Customer c = new Customer();
@@ -205,7 +216,9 @@ public class DataGenerator implements CommandLineRunner {
             c.setSalesperson(salesPeople[r.nextInt(salesPeople.length)]);
             c.setRemarks(r.nextInt(10) > 7 ? "价格可谈" : "");
             c.setStatus(r.nextDouble() < 0.3 ? "NEW" : r.nextDouble() < 0.5 ? "FOLLOWING" : r.nextDouble() < 0.7 ? "NEGOTIATING" : r.nextDouble() < 0.85 ? "WON" : "LOST");
-            c.setAssignedTo(r.nextBoolean() ? salesPeople[r.nextInt(salesPeople.length)] : null);
+            String sysUser = systemUsers[r.nextInt(systemUsers.length)];
+            c.setAssignedTo(sysUser);
+            c.setAssignedToUserId(userIdMap.get(sysUser));
             list.add(c);
         }
         return list;

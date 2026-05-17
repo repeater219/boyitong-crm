@@ -8,6 +8,7 @@ import com.boyitong.repository.UploadRecordRepository;
 import com.boyitong.service.AuditLogService;
 import com.boyitong.service.ImportService;
 import com.boyitong.service.NotificationService;
+import com.boyitong.service.UserResolver;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -26,17 +27,20 @@ public class UploadController {
     private final UploadRecordRepository uploadRecordRepository;
     private final AuditLogService auditLogService;
     private final NotificationService notificationService;
+    private final UserResolver userResolver;
 
     public UploadController(ImportService importService,
                             CustomerRepository customerRepository,
                             UploadRecordRepository uploadRecordRepository,
                             AuditLogService auditLogService,
-                            NotificationService notificationService) {
+                            NotificationService notificationService,
+                            UserResolver userResolver) {
         this.importService = importService;
         this.customerRepository = customerRepository;
         this.uploadRecordRepository = uploadRecordRepository;
         this.auditLogService = auditLogService;
         this.notificationService = notificationService;
+        this.userResolver = userResolver;
     }
 
     /** 业务员上传Excel，进入待审核状态 */
@@ -49,6 +53,7 @@ public class UploadController {
 
         UploadRecord record = new UploadRecord();
         record.setUploader(uploader);
+        record.setUploaderUserId(userResolver.getUserId(uploader));
         record.setCity(city);
         record.setFileName(file.getOriginalFilename());
         record.setFileData(file.getBytes());
@@ -82,6 +87,7 @@ public class UploadController {
 
         record.setStatus("APPROVED");
         record.setReviewer(auth.getName());
+        record.setReviewerUserId(userResolver.getUserId(auth.getName()));
         record.setReviewedAt(LocalDateTime.now());
         if (request != null) {
             record.setReviewComment(request.getComment());
@@ -111,6 +117,7 @@ public class UploadController {
 
         record.setStatus("REJECTED");
         record.setReviewer(auth.getName());
+        record.setReviewerUserId(userResolver.getUserId(auth.getName()));
         record.setReviewedAt(LocalDateTime.now());
         if (request != null) {
             record.setReviewComment(request.getComment());

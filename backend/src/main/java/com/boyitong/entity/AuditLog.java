@@ -14,6 +14,9 @@ public class AuditLog {
     @Column(name = "username", nullable = false)
     private String username;
 
+    @Column(name = "user_id")
+    private Long userId;
+
     @Column(name = "action", nullable = false)
     private String action;
 
@@ -39,8 +42,19 @@ public class AuditLog {
         this.detail = detail;
     }
 
+    public AuditLog(String username, Long userId, String action, String targetType, String targetId, String detail) {
+        this.username = username;
+        this.userId = userId;
+        this.action = action;
+        this.targetType = targetType;
+        this.targetId = targetId;
+        this.detail = detail;
+    }
+
     public Long getId() { return id; }
     public String getUsername() { return username; }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
     public String getAction() { return action; }
     public String getTargetType() { return targetType; }
     public String getTargetId() { return targetId; }

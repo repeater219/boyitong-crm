@@ -4,6 +4,7 @@ import com.boyitong.common.Result;
 import com.boyitong.entity.Task;
 import com.boyitong.repository.TaskRepository;
 import com.boyitong.service.AuditLogService;
+import com.boyitong.service.UserResolver;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,10 +17,12 @@ public class TaskController {
 
     private final TaskRepository taskRepository;
     private final AuditLogService auditLogService;
+    private final UserResolver userResolver;
 
-    public TaskController(TaskRepository taskRepository, AuditLogService auditLogService) {
+    public TaskController(TaskRepository taskRepository, AuditLogService auditLogService, UserResolver userResolver) {
         this.taskRepository = taskRepository;
         this.auditLogService = auditLogService;
+        this.userResolver = userResolver;
     }
 
     @GetMapping
@@ -41,6 +44,7 @@ public class TaskController {
     public Result<Task> create(@RequestBody Task task, Authentication auth) {
         task.setId(null);
         task.setAssignee(auth.getName());
+        task.setAssigneeUserId(userResolver.getUserId(auth.getName()));
         Task saved = taskRepository.save(task);
         auditLogService.log(auth.getName(), "CREATE_TASK", "Task", String.valueOf(saved.getId()),
                 "创建任务: " + task.getTitle());

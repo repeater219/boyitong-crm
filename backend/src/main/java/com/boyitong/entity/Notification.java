@@ -15,6 +15,10 @@ public class Notification {
     @Column(name = "recipient", nullable = false)
     private String recipient;
 
+    /** 接收者用户ID（null 表示全体管理员通知） */
+    @Column(name = "recipient_user_id")
+    private Long recipientUserId;
+
     /** 标题 */
     @Column(name = "title", nullable = false)
     private String title;
@@ -43,6 +47,9 @@ public class Notification {
 
     public String getRecipient() { return recipient; }
     public void setRecipient(String recipient) { this.recipient = recipient; }
+
+    public Long getRecipientUserId() { return recipientUserId; }
+    public void setRecipientUserId(Long recipientUserId) { this.recipientUserId = recipientUserId; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }

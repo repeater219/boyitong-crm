@@ -3,6 +3,8 @@ package com.boyitong.controller;
 import com.boyitong.common.Result;
 import com.boyitong.entity.*;
 import com.boyitong.repository.*;
+import com.boyitong.service.UserResolver;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,34 +22,31 @@ public class CrmController {
     private final PaymentRepository paymentRepo;
     private final ContactRepository contactRepo;
     private final AnnouncementRepository announcementRepo;
+    private final UserResolver userResolver;
 
     public CrmController(ProductRepository productRepo, OpportunityRepository oppRepo,
                          ContractRepository contractRepo, PaymentRepository paymentRepo,
-                         ContactRepository contactRepo, AnnouncementRepository announcementRepo) {
+                         ContactRepository contactRepo, AnnouncementRepository announcementRepo,
+                         UserResolver userResolver) {
         this.productRepo = productRepo;
         this.oppRepo = oppRepo;
         this.contractRepo = contractRepo;
         this.paymentRepo = paymentRepo;
         this.contactRepo = contactRepo;
         this.announcementRepo = announcementRepo;
+        this.userResolver = userResolver;
     }
 
     // ========= PRODUCTS =========
     @GetMapping("/products") public Result<List<Product>> getProducts() { return Result.success(productRepo.findAll()); }
-    @PostMapping("/products") public Result<Product> createProduct(@RequestBody Product p, Authentication auth) {
-        boolean isAdmin = auth.getAuthorities().stream().anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
-        if (!isAdmin) throw new RuntimeException("仅管理员可添加产品");
-        return Result.success(productRepo.save(p));
-    }
-    @DeleteMapping("/products/{id}") public Result<Void> deleteProduct(@PathVariable Long id, Authentication auth) {
-        boolean isAdmin = auth.getAuthorities().stream().anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
-        if (!isAdmin) throw new RuntimeException("仅管理员可删除产品");
-        productRepo.deleteById(id); return Result.success();
-    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/products") public Result<Product> createProduct(@RequestBody Product p) { return Result.success(productRepo.save(p)); }
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/products/{id}") public Result<Void> deleteProduct(@PathVariable Long id) { productRepo.deleteById(id); return Result.success(); }
 
     // ========= OPPORTUNITIES =========
     @GetMapping("/opportunities") public Result<List<Opportunity>> getOpps(Authentication auth) { return Result.success(oppRepo.findBySalespersonOrderByCreatedAtDesc(auth.getName())); }
-    @PostMapping("/opportunities") public Result<Opportunity> createOpp(@RequestBody Opportunity o, Authentication auth) { o.setSalesperson(auth.getName()); o.setWinRate(calcWinRate(o.getStage())); return Result.success(oppRepo.save(o)); }
+    @PostMapping("/opportunities") public Result<Opportunity> createOpp(@RequestBody Opportunity o, Authentication auth) { o.setSalesperson(auth.getName()); o.setSalespersonUserId(userResolver.getUserId(auth.getName())); o.setWinRate(calcWinRate(o.getStage())); return Result.success(oppRepo.save(o)); }
     @PutMapping("/opportunities/{id}") public Result<Opportunity> updateOpp(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         Opportunity o = oppRepo.findById(id).orElseThrow();
         if (body.containsKey("stage")) { o.setStage((String)body.get("stage")); o.setWinRate(calcWinRate((String)body.get("stage"))); }
@@ -67,6 +66,7 @@ public class CrmController {
     @PostMapping("/contracts") public Result<Contract> createContract(@RequestBody Contract c, Authentication auth) {
         c.setContractNo("CT-" + System.currentTimeMillis() % 1000000);
         c.setSalesperson(auth.getName());
+        c.setSalespersonUserId(userResolver.getUserId(auth.getName()));
         return Result.success(contractRepo.save(c));
     }
     @PutMapping("/contracts/{id}/status") public Result<Contract> updateContractStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
@@ -83,14 +83,12 @@ public class CrmController {
 
     // ========= ANNOUNCEMENTS =========
     @GetMapping("/announcements") public Result<List<Announcement>> getAnnouncements() { return Result.success(announcementRepo.findAllByOrderByPinnedDescCreatedAtDesc()); }
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/announcements") public Result<Announcement> createAnnouncement(@RequestBody Announcement a, Authentication auth) {
-        boolean isAdmin = auth.getAuthorities().stream().anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
-        if (!isAdmin) throw new RuntimeException("仅管理员可发布公告");
-        a.setAuthor(auth.getName()); return Result.success(announcementRepo.save(a));
+        a.setAuthor(auth.getName());
+        a.setAuthorUserId(userResolver.getUserId(auth.getName()));
+        return Result.success(announcementRepo.save(a));
     }
-    @DeleteMapping("/announcements/{id}") public Result<Void> deleteAnnouncement(@PathVariable Long id, Authentication auth) {
-        boolean isAdmin = auth.getAuthorities().stream().anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
-        if (!isAdmin) throw new RuntimeException("仅管理员可删除公告");
-        announcementRepo.deleteById(id); return Result.success();
-    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/announcements/{id}") public Result<Void> deleteAnnouncement(@PathVariable Long id) { announcementRepo.deleteById(id); return Result.success(); }
 }

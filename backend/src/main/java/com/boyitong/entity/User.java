@@ -20,6 +20,10 @@ public class User {
     @Column(nullable = false)
     private String role;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_entity_id")
+    private Role roleEntity;
+
     @Column(name = "display_name")
     private String displayName;
 
@@ -46,6 +50,9 @@ public class User {
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public Role getRoleEntity() { return roleEntity; }
+    public void setRoleEntity(Role roleEntity) { this.roleEntity = roleEntity; }
 
     public String getDisplayName() { return displayName; }
     public void setDisplayName(String displayName) { this.displayName = displayName; }

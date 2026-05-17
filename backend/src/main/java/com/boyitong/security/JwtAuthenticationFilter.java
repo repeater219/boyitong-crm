@@ -1,5 +1,7 @@
 package com.boyitong.security;
 
+import com.boyitong.entity.User;
+import com.boyitong.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,15 +13,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final UserRepository userRepository;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserRepository userRepository) {
         this.jwtUtil = jwtUtil;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -36,11 +41,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String username = jwtUtil.getUsername(token);
                 String role = jwtUtil.getRole(token);
 
-                List<SimpleGrantedAuthority> authorities = List.of(
-                        new SimpleGrantedAuthority("ROLE_" + role));
+                List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
+
+                // Load permission-based authorities from database
+                userRepository.findByUsername(username).ifPresent(user -> {
+                    if (user.getRoleEntity() != null && user.getRoleEntity().getPermissions() != null) {
+                        user.getRoleEntity().getPermissions().forEach(perm ->
+                            authorities.add(new SimpleGrantedAuthority(perm.getName())));
+                    }
+                });
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(username, null, authorities);
+                authentication.setDetails(jwtUtil.getUserId(token));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }

@@ -14,6 +14,8 @@ public class Opportunity {
     private String stage; // INTENT / PROPOSAL / QUOTATION / NEGOTIATION / WON / LOST
     private Double winRate;
     private String salesperson;
+    @Column(name = "salesperson_user_id")
+    private Long salespersonUserId;
     private String description;
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -24,6 +26,7 @@ public class Opportunity {
     public String getStage() { return stage; } public void setStage(String stage) { this.stage = stage; }
     public Double getWinRate() { return winRate; } public void setWinRate(Double winRate) { this.winRate = winRate; }
     public String getSalesperson() { return salesperson; } public void setSalesperson(String salesperson) { this.salesperson = salesperson; }
+    public Long getSalespersonUserId() { return salespersonUserId; } public void setSalespersonUserId(Long salespersonUserId) { this.salespersonUserId = salespersonUserId; }
     public String getDescription() { return description; } public void setDescription(String description) { this.description = description; }
     public LocalDateTime getCreatedAt() { return createdAt; } public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

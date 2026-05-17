@@ -9,6 +9,7 @@ import com.boyitong.repository.CustomerRepository;
 import com.boyitong.service.AuditLogService;
 import com.boyitong.service.CustomerService;
 import com.boyitong.service.CustomerServiceImpl;
+import com.boyitong.service.UserResolver;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,15 +27,18 @@ public class CustomerController {
     private final CustomerServiceImpl customerServiceImpl;
     private final CustomerRepository customerRepository;
     private final AuditLogService auditLogService;
+    private final UserResolver userResolver;
 
     public CustomerController(CustomerService customerService,
                               CustomerServiceImpl customerServiceImpl,
                               CustomerRepository customerRepository,
-                              AuditLogService auditLogService) {
+                              AuditLogService auditLogService,
+                              UserResolver userResolver) {
         this.customerService = customerService;
         this.customerServiceImpl = customerServiceImpl;
         this.customerRepository = customerRepository;
         this.auditLogService = auditLogService;
+        this.userResolver = userResolver;
     }
 
     @GetMapping
@@ -58,7 +62,7 @@ public class CustomerController {
                 query.getSortBy(), query.getSortDir());
 
         List<CustomerVO> voList = page.getContent().stream()
-                .map(CustomerVO::fromEntity)
+                .map(c -> CustomerVO.fromEntity(c, userResolver))
                 .toList();
 
         PageResult<CustomerVO> pageResult = new PageResult<>(
@@ -71,7 +75,7 @@ public class CustomerController {
     public Result<CustomerVO> getById(@PathVariable Long id) {
         Customer customer = customerService.findById(id);
         checkCustomerAccess(customer);
-        return Result.success(CustomerVO.fromEntity(customer));
+        return Result.success(CustomerVO.fromEntity(customer, userResolver));
     }
 
     @PutMapping("/{id}")
@@ -96,7 +100,7 @@ public class CustomerController {
                     "更新客户数据 #" + id);
         }
 
-        return Result.success(CustomerVO.fromEntity(existing));
+        return Result.success(CustomerVO.fromEntity(existing, userResolver));
     }
 
     @DeleteMapping("/{id}")
@@ -148,15 +152,21 @@ public class CustomerController {
     @PutMapping("/{id}/assign")
     public Result<CustomerVO> assign(@PathVariable Long id, @RequestBody Map<String, String> body) {
         Customer customer = customerService.findById(id);
-        customer.setAssignedTo(body.get("assignedTo"));
+        String assignedTo = body.get("assignedTo");
+        customer.setAssignedTo(assignedTo);
+        if (assignedTo != null && !assignedTo.isBlank()) {
+            customer.setAssignedToUserId(userResolver.getUserId(assignedTo));
+        } else {
+            customer.setAssignedToUserId(null);
+        }
         customerRepository.save(customer);
 
         String username = getCurrentUsername();
         if (username != null) {
             auditLogService.log(username, "ASSIGN", "Customer", String.valueOf(id),
-                    "分配客户 #" + id + " 给 " + body.get("assignedTo"));
+                    "分配客户 #" + id + " 给 " + assignedTo);
         }
-        return Result.success(CustomerVO.fromEntity(customer));
+        return Result.success(CustomerVO.fromEntity(customer, userResolver));
     }
 
     /** 管理员变更客户状态 */
@@ -165,7 +175,7 @@ public class CustomerController {
         Customer customer = customerService.findById(id);
         customer.setStatus(body.get("status"));
         customerRepository.save(customer);
-        return Result.success(CustomerVO.fromEntity(customer));
+        return Result.success(CustomerVO.fromEntity(customer, userResolver));
     }
 
     /** 检查重复客户 */
@@ -180,7 +190,7 @@ public class CustomerController {
         } else {
             return Result.success(List.of());
         }
-        return Result.success(matches.stream().map(CustomerVO::fromEntity).toList());
+        return Result.success(matches.stream().map(c -> CustomerVO.fromEntity(c, userResolver)).toList());
     }
 
     /** 客户下拉选项（轻量级，仅返回 id + 地址） */
@@ -212,7 +222,7 @@ public class CustomerController {
     @GetMapping("/unassigned")
     public Result<List<CustomerVO>> getUnassigned() {
         return Result.success(customerRepository.findByAssignedToIsNullOrAssignedTo("")
-                .stream().map(CustomerVO::fromEntity).toList());
+                .stream().map(c -> CustomerVO.fromEntity(c, userResolver)).toList());
     }
 
     /** 获取分配给当前用户的客户 */
@@ -221,6 +231,6 @@ public class CustomerController {
         String username = getCurrentUsername();
         if (username == null) return Result.success(List.of());
         return Result.success(customerRepository.findByAssignedTo(username)
-                .stream().map(CustomerVO::fromEntity).toList());
+                .stream().map(c -> CustomerVO.fromEntity(c, userResolver)).toList());
     }
 }

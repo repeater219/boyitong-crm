@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,6 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableMethodSecurity
 @Profile("!test")
 public class SecurityConfig {
 
@@ -49,6 +51,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/crm/**").authenticated()
                 .requestMatchers("/api/ai/**").authenticated()
                 .requestMatchers("/api/profile/**").authenticated()
+                .requestMatchers("/api/users/**").authenticated()
                 .requestMatchers("/", "/index.html", "/static/**", "/*.js", "/*.css", "/*.json", "/*.ico", "/*.png", "/*.svg", "/*.jpg", "/*.jpeg", "/*.woff", "/*.woff2", "/*.ttf", "/*.eot", "/assets/**").permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()

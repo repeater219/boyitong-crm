@@ -1,6 +1,7 @@
 package com.boyitong.dto;
 
 import com.boyitong.entity.Customer;
+import com.boyitong.service.UserResolver;
 
 public class CustomerVO {
     private Long id;
@@ -17,8 +18,13 @@ public class CustomerVO {
     private String accountName;
     private String status;
     private String assignedTo;
+    private String assignedToDisplayName;
 
     public static CustomerVO fromEntity(Customer c) {
+        return fromEntity(c, null);
+    }
+
+    public static CustomerVO fromEntity(Customer c, UserResolver userResolver) {
         CustomerVO vo = new CustomerVO();
         vo.setId(c.getId());
         vo.setCity(c.getCity());
@@ -34,6 +40,9 @@ public class CustomerVO {
         vo.setAccountName(c.getAccountName());
         vo.setStatus(c.getStatus());
         vo.setAssignedTo(c.getAssignedTo());
+        if (userResolver != null) {
+            vo.setAssignedToDisplayName(userResolver.resolveDisplayName(c.getAssignedToUserId(), c.getAssignedTo()));
+        }
         return vo;
     }
 
@@ -79,4 +88,7 @@ public class CustomerVO {
 
     public String getAssignedTo() { return assignedTo; }
     public void setAssignedTo(String assignedTo) { this.assignedTo = assignedTo; }
+
+    public String getAssignedToDisplayName() { return assignedToDisplayName; }
+    public void setAssignedToDisplayName(String assignedToDisplayName) { this.assignedToDisplayName = assignedToDisplayName; }
 }

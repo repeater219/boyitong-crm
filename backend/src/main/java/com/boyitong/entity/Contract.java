@@ -18,6 +18,8 @@ public class Contract {
     private LocalDate startDate;
     private LocalDate endDate;
     private String salesperson;
+    @Column(name = "salesperson_user_id")
+    private Long salespersonUserId;
     private String description;
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -31,6 +33,7 @@ public class Contract {
     public LocalDate getStartDate() { return startDate; } public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
     public LocalDate getEndDate() { return endDate; } public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
     public String getSalesperson() { return salesperson; } public void setSalesperson(String salesperson) { this.salesperson = salesperson; }
+    public Long getSalespersonUserId() { return salespersonUserId; } public void setSalespersonUserId(Long salespersonUserId) { this.salespersonUserId = salespersonUserId; }
     public String getDescription() { return description; } public void setDescription(String description) { this.description = description; }
     public LocalDateTime getCreatedAt() { return createdAt; } public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

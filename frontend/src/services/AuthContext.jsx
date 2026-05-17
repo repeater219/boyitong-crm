@@ -6,15 +6,29 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [userMap, setUserMap] = useState({})
 
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
       api.defaults.headers.common['Authorization'] = 'Bearer ' + token
-      api.get('/auth/me')
-        .then(res => setUser(res.data.data))
-        .catch(() => { localStorage.removeItem('token'); delete api.defaults.headers.common['Authorization'] })
-        .finally(() => setLoading(false))
+      const loadInitial = async () => {
+        try {
+          const res = await api.get('/auth/me')
+          setUser(res.data.data)
+          // Load user map
+          const usersRes = await api.get('/users')
+          const map = {}
+          usersRes.data.data.forEach(u => { map[u.username] = u.displayName })
+          setUserMap(map)
+        } catch (e) {
+          localStorage.removeItem('token')
+          delete api.defaults.headers.common['Authorization']
+        } finally {
+          setLoading(false)
+        }
+      }
+      loadInitial()
     } else {
       setLoading(false)
     }
@@ -26,6 +40,13 @@ export function AuthProvider({ children }) {
     localStorage.setItem('token', data.token)
     api.defaults.headers.common['Authorization'] = 'Bearer ' + data.token
     setUser(data)
+    // Load user map after login
+    try {
+      const usersRes = await api.get('/users')
+      const map = {}
+      usersRes.data.data.forEach(u => { map[u.username] = u.displayName })
+      setUserMap(map)
+    } catch (_) {}
     return data
   }
 
@@ -33,6 +54,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('token')
     delete api.defaults.headers.common['Authorization']
     setUser(null)
+    setUserMap({})
   }
 
   const refreshUser = async () => {
@@ -43,7 +65,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, refreshUser }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, refreshUser, userMap }}>
       {children}
     </AuthContext.Provider>
   )
