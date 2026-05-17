@@ -90,7 +90,8 @@
       "Bash(ls /Users/Zhuanz/Desktop/internship/backend/src/main/java/com/boyitong/entity/*.java)",
       "Bash(ls /Users/Zhuanz/Desktop/internship/backend/src/main/java/com/boyitong/repository/*.java)",
       "Bash(timeout:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(cp:*)"
     ]
   }
 }
