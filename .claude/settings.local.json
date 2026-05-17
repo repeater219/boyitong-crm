@@ -91,7 +91,9 @@
       "Bash(ls /Users/Zhuanz/Desktop/internship/backend/src/main/java/com/boyitong/repository/*.java)",
       "Bash(timeout:*)",
       "Bash(echo:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(cp -r dist/* ../backend/src/main/resources/static/)",
+      "Read(//Users/Zhuanz/Desktop/**)"
     ]
   }
 }
