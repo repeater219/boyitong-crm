@@ -6,7 +6,7 @@ import {
   UploadOutlined, AuditOutlined, FileTextOutlined, ShoppingCartOutlined,
   DollarOutlined, BellOutlined, BulbOutlined,
   CalendarOutlined, LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined,
-  UserOutlined, SettingOutlined
+  UserOutlined, SettingOutlined, SafetyOutlined
 } from '@ant-design/icons'
 import { useAuth } from '../services/AuthContext.jsx'
 import api from '../services/api.js'
@@ -52,6 +52,7 @@ export default function AppLayout({ children }) {
     ...(isAdmin ? [
       { key: '/review', icon: <AuditOutlined />, label: '审核管理' },
       { key: '/audit-logs', icon: <DatabaseOutlined />, label: '操作日志' },
+      { key: '/users', icon: <SafetyOutlined />, label: '用户管理' },
     ] : []),
     { key: '/announcements', icon: <BellOutlined />, label: '公告中心' },
   ]

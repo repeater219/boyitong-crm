@@ -17,6 +17,7 @@ import Contracts from './pages/Contracts.jsx'
 import Announcements from './pages/Announcements.jsx'
 import CalendarView from './pages/CalendarView.jsx'
 import Profile from './pages/Profile.jsx'
+import Users from './pages/Users.jsx'
 
 function AdminRoute({ children }) {
   const { user } = useAuth()
@@ -53,6 +54,7 @@ function App() {
             <Route path="/contracts" element={<Contracts />} />
             <Route path="/announcements" element={<Announcements />} />
             <Route path="/calendar" element={<CalendarView />} />
+            <Route path="/users" element={<AdminRoute><Users /></AdminRoute>} />
             <Route path="/profile" element={<Profile />} />
           </Routes>
         </Layout>
