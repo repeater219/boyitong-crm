@@ -4,6 +4,7 @@ import com.boyitong.common.Result;
 import com.boyitong.dto.StatsVO;
 import com.boyitong.entity.Customer;
 import com.boyitong.repository.CustomerRepository;
+import com.boyitong.security.SecurityUtils;
 import com.boyitong.service.StatsService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,9 +31,7 @@ public class StatsController {
     public Result<StatsVO> getStats() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-            boolean isAdmin = auth.getAuthorities().stream()
-                    .anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
-            if (!isAdmin) {
+            if (!SecurityUtils.canViewAllData(auth)) {
                 return Result.success(statsService.getStatsForUser(auth.getName()));
             }
         }
@@ -44,9 +43,7 @@ public class StatsController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         List<Customer> all;
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-            boolean isAdmin = auth.getAuthorities().stream()
-                    .anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
-            if (!isAdmin) {
+            if (!SecurityUtils.canViewAllData(auth)) {
                 all = customerRepository.findByAssignedTo(auth.getName());
             } else {
                 all = customerRepository.findAll();

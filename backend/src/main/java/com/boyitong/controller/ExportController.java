@@ -3,6 +3,7 @@ package com.boyitong.controller;
 import com.boyitong.entity.Customer;
 import com.boyitong.entity.CustomerSpecification;
 import com.boyitong.repository.CustomerRepository;
+import com.boyitong.security.SecurityUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -44,9 +45,7 @@ public class ExportController {
         // USER 角色只能导出分配给自己的客户
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-            boolean isAdmin = auth.getAuthorities().stream()
-                    .anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
-            if (!isAdmin) {
+            if (!SecurityUtils.canViewAllData(auth)) {
                 spec = spec.and((root, query, cb) -> cb.equal(root.get("assignedTo"), auth.getName()));
             }
         }

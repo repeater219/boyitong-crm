@@ -3,6 +3,7 @@ package com.boyitong.controller;
 import com.boyitong.common.Result;
 import com.boyitong.entity.*;
 import com.boyitong.repository.*;
+import com.boyitong.security.SecurityUtils;
 import com.boyitong.service.UserResolver;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -45,7 +46,12 @@ public class CrmController {
     @DeleteMapping("/products/{id}") public Result<Void> deleteProduct(@PathVariable Long id) { productRepo.deleteById(id); return Result.success(); }
 
     // ========= OPPORTUNITIES =========
-    @GetMapping("/opportunities") public Result<List<Opportunity>> getOpps(Authentication auth) { return Result.success(oppRepo.findBySalespersonOrderByCreatedAtDesc(auth.getName())); }
+    @GetMapping("/opportunities") public Result<List<Opportunity>> getOpps(Authentication auth) {
+        if (SecurityUtils.canViewAllData(auth)) {
+            return Result.success(oppRepo.findAllByOrderByCreatedAtDesc());
+        }
+        return Result.success(oppRepo.findBySalespersonOrderByCreatedAtDesc(auth.getName()));
+    }
     @PostMapping("/opportunities") public Result<Opportunity> createOpp(@RequestBody Opportunity o, Authentication auth) { o.setSalesperson(auth.getName()); o.setSalespersonUserId(userResolver.getUserId(auth.getName())); o.setWinRate(calcWinRate(o.getStage())); return Result.success(oppRepo.save(o)); }
     @PutMapping("/opportunities/{id}") public Result<Opportunity> updateOpp(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         Opportunity o = oppRepo.findById(id).orElseThrow();
@@ -57,8 +63,7 @@ public class CrmController {
 
     // ========= CONTRACTS =========
     @GetMapping("/contracts") public Result<List<Contract>> getContracts(Authentication auth) {
-        boolean isAdmin = auth.getAuthorities().stream().anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
-        if (isAdmin) {
+        if (SecurityUtils.canViewAllData(auth)) {
             return Result.success(contractRepo.findAll());
         }
         return Result.success(contractRepo.findBySalespersonOrderByCreatedAtDesc(auth.getName()));

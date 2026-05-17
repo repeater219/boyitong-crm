@@ -10,6 +10,7 @@ import com.boyitong.service.AuditLogService;
 import com.boyitong.service.CustomerService;
 import com.boyitong.service.CustomerServiceImpl;
 import com.boyitong.service.UserResolver;
+import com.boyitong.security.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,9 +47,7 @@ public class CustomerController {
         String assignedTo = null;
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-            boolean isAdmin = auth.getAuthorities().stream()
-                    .anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
-            if (!isAdmin) {
+            if (!SecurityUtils.canViewAllData(auth)) {
                 assignedTo = auth.getName();
             }
         }
@@ -130,9 +129,7 @@ public class CustomerController {
     private void checkCustomerAccess(Customer customer) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-            boolean isAdmin = auth.getAuthorities().stream()
-                    .anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
-            if (!isAdmin) {
+            if (!SecurityUtils.canViewAllData(auth)) {
                 String username = auth.getName();
                 if (customer.getAssignedTo() == null || !customer.getAssignedTo().equals(username)) {
                     throw new RuntimeException("无权访问该客户数据");
@@ -199,9 +196,7 @@ public class CustomerController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         List<Customer> all;
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-            boolean isAdmin = auth.getAuthorities().stream()
-                    .anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
-            if (isAdmin) {
+            if (SecurityUtils.canViewAllData(auth)) {
                 all = customerRepository.findAll();
             } else {
                 all = customerRepository.findByAssignedTo(auth.getName());

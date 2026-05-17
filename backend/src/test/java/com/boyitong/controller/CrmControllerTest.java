@@ -112,6 +112,9 @@ class CrmControllerTest {
     void getOpportunities_ShouldReturnOnlyUserOwned() throws Exception {
         Opportunity o1 = new Opportunity(); o1.setName("我的商机"); o1.setSalesperson("admin"); oppRepo.save(o1);
         Opportunity o2 = new Opportunity(); o2.setName("别人的商机"); o2.setSalesperson("other"); oppRepo.save(o2);
+        // 用普通 USER 角色（无 ALL_DATA_VIEW 权限），只能看到自己的商机
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("admin", null, List.of(new SimpleGrantedAuthority("ROLE_USER"))));
         mockMvc.perform(get("/api/crm/opportunities"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.length()").value(1))
