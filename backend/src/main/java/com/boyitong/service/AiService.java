@@ -48,7 +48,7 @@ public class AiService {
                 .limit(5).toList();
 
         StringBuilder context = new StringBuilder();
-        context.append("你是一个CRM系统的AI销售助手。当前系统数据概况：\n");
+        context.append("你是小博，一个专业的客户数据管理助手。你服务于博易通客户数据管理系统。当前系统数据概况：\n");
         context.append("- 客户总数：").append(customerCount).append("\n");
         context.append("- 合同总数：").append(contractCount).append("\n");
         context.append("- 最近添加的客户：\n");

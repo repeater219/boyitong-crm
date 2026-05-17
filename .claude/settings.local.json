@@ -72,7 +72,25 @@
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\)[''''data'''']; print\\(f''''token: {d[\"\"token\"\"][:30]}...\\\\nuserId: {d[\"\"userId\"\"]}\\\\nrole: {d[\"\"role\"\"]}''''\\)\")",
       "Bash(grep -rn Route /Users/Zhuanz/Desktop/internship/frontend/src/App.*)",
       "Bash(RAILWAY_API_TOKEN=a129fc8b-953e-4ddb-bd39-5ebca48a2e1b railway up --service boyitong-crm 2>&1)",
-      "Bash(RAILWAY_API_TOKEN=a129fc8b-953e-4ddb-bd39-5ebca48a2e1b railway status --service boyitong-crm)"
+      "Bash(RAILWAY_API_TOKEN=a129fc8b-953e-4ddb-bd39-5ebca48a2e1b railway status --service boyitong-crm)",
+      "Bash(python3:*)",
+      "Bash(file:*)",
+      "Bash(RAILWAY_API_TOKEN=\"a129fc8b-953e-4ddb-bd39-5ebca48a2e1b\" railway logs --deployment 7974bcb2-1494-47d5-a0f0-28fca89d1286)",
+      "Bash(RAILWAY_API_TOKEN=\"a129fc8b-953e-4ddb-bd39-5ebca48a2e1b\" railway service 2>&1)",
+      "Bash(RAILWAY_API_TOKEN=\"a129fc8b-953e-4ddb-bd39-5ebca48a2e1b\" railway service boyitong-crm 2>&1)",
+      "Bash(RAILWAY_API_TOKEN=\"a129fc8b-953e-4ddb-bd39-5ebca48a2e1b\" railway logs)",
+      "Bash(find src/main/java -name \"*.java\" -exec cat {} +)",
+      "Bash(find src:*)",
+      "Bash(grep -c .java$)",
+      "Bash(ls backend/src/main/java/com/boyitong/controller/*.java)",
+      "Bash(ls backend/src/main/java/com/boyitong/entity/*.java)",
+      "Bash(ls backend/src/main/java/com/boyitong/repository/*.java)",
+      "Bash(grep -c @Test backend/src/test/**/*.java)",
+      "Bash(ls /Users/Zhuanz/Desktop/internship/backend/src/main/java/com/boyitong/controller/*.java)",
+      "Bash(ls /Users/Zhuanz/Desktop/internship/backend/src/main/java/com/boyitong/entity/*.java)",
+      "Bash(ls /Users/Zhuanz/Desktop/internship/backend/src/main/java/com/boyitong/repository/*.java)",
+      "Bash(timeout:*)",
+      "Bash(echo:*)"
     ]
   }
 }

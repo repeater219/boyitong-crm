@@ -7,7 +7,7 @@ const { Text } = Typography
 
 export default function AiChat() {
   const [open, setOpen] = useState(false)
-  const [messages, setMessages] = useState([{ role: 'ai', content: '你好！我是AI销售助手，可以问我关于系统数据的问题，或者帮你生成跟进文案。' }])
+  const [messages, setMessages] = useState([{ role: 'ai', content: '你好！我是小博，你的客户数据管理助手，可以问我关于系统数据的问题，或者帮你生成跟进文案。' }])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const bottomRef = useRef(null)
@@ -39,7 +39,7 @@ export default function AiChat() {
           display: 'flex', flexDirection: 'column', zIndex: 1000, overflow: 'hidden'
         }}>
           <div style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#1677ff', color: '#fff' }}>
-            <Space><RobotOutlined /><Text strong style={{ color: '#fff' }}>AI 销售助手</Text></Space>
+            <Space><RobotOutlined /><Text strong style={{ color: '#fff' }}>小博</Text></Space>
             <Button type="text" size="small" icon={<CloseOutlined />} onClick={() => setOpen(false)} style={{ color: '#fff' }} />
           </div>
           <div style={{ flex: 1, overflow: 'auto', padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>

@@ -72,7 +72,7 @@ export default function CustomerDetail() {
     { label: '城市', value: customer.city },
     { label: '日期', value: customer.date },
     { label: '区域', value: customer.area },
-    { label: '地址', value: customer.address },
+    { label: '转让标题', value: customer.address },
     { label: '行业/板块', value: customer.category },
     { label: '面积', value: customer.size ? `${customer.size} m²` : '-' },
     { label: '电话', value: customer.phone },

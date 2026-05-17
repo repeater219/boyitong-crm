@@ -43,7 +43,7 @@ export default function FilterBar({ filters, onChange, onReset }) {
         <div>
           <label className="block text-xs text-gray-500 mb-1">关键词</label>
           <input value={filters.keyword || ''} onChange={e => handleChange('keyword', e.target.value)}
-            placeholder="搜索地址/备注" className="w-full border rounded px-2 py-1.5 text-sm" />
+            placeholder="搜索标题/备注" className="w-full border rounded px-2 py-1.5 text-sm" />
         </div>
       </div>
       <div className="mt-3 flex gap-2">

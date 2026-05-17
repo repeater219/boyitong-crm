@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Table, Button, Modal, Form, Input, InputNumber, Select, Tag, message, Card, Row, Col, Statistic, Steps } from 'antd'
-import { PlusOutlined } from '@ant-design/icons'
+import { PlusOutlined, LinkOutlined } from '@ant-design/icons'
+import { useNavigate } from 'react-router-dom'
 import api from '../services/api.js'
 
 const STAGE_CONFIG = {
@@ -18,6 +19,7 @@ export default function Opportunities() {
   const [open, setOpen] = useState(false)
   const [form] = Form.useForm()
   const [customers, setCustomers] = useState([])
+  const navigate = useNavigate()
 
   const load = async () => {
     setLoading(true)
@@ -56,8 +58,9 @@ export default function Opportunities() {
           options={Object.entries(STAGE_CONFIG).map(([k, v]) => ({ value: k, label: v.label }))} />
       )
     },
-    { title: '赢单率', dataIndex: 'winRate', key: 'winRate', render: v => `${v || 0}%` },
-    { title: '客户ID', dataIndex: 'customerId', key: 'customerId' },
+    { title: '关联客户', dataIndex: 'customerId', key: 'customerId',
+      render: (v) => <a onClick={() => navigate(`/customers/${v}`)} style={{ cursor: 'pointer' }}><LinkOutlined /> 客户 #{v}</a>
+    },
   ]
 
   return (

@@ -59,7 +59,7 @@ public class ExportController {
             Sheet sheet = workbook.createSheet("客户数据");
 
             // Header
-            String[] headers = {"ID", "城市", "日期", "区域", "地址", "行业/板块", "面积", "电话", "到期日期", "销售员", "备注"};
+            String[] headers = {"ID", "城市", "日期", "区域", "转让标题", "行业/板块", "面积", "电话", "到期日期", "销售员", "备注"};
             Row headerRow = sheet.createRow(0);
             for (int i = 0; i < headers.length; i++) {
                 headerRow.createCell(i).setCellValue(headers[i]);
